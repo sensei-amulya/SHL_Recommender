@@ -40,6 +40,10 @@ def extract_shl_urls(text: str) -> list:
 async def startup_event():
     search_engine.load_and_clean_data()
 
+@app.get("/")
+async def root():
+    return {"message": "SHL Recommender API is running. Use POST /chat for recommendations, or GET /health for health check."}
+
 @app.get("/health")
 async def health_check():
     return {"status": "ok"}
