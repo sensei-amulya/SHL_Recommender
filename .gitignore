@@ -1,6 +1,9 @@
 # Ignore environment variables and API keys
 .env
 
+# Ignore local approach summary document
+approach.html
+
 
 # Python caches and virtual environments
 __pycache__/
