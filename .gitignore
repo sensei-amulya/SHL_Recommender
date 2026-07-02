@@ -4,9 +4,6 @@
 # Ignore generated/exported HTML artifacts
 approach_summary.html
 
-# Ignore README document as requested
-README.md
-
 # Python caches and virtual environments
 __pycache__/
 *.py[cod]
