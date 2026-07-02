@@ -1,13 +1,14 @@
 import json
 import os
 import chromadb
-from chromadb.utils import embedding_functions
+from sklearn.feature_extraction.text import TfidfVectorizer
 
 CATALOG_DICT = {}
 CATALOG_LIST = []
 CATALOG_BY_URL = {}
 CHROMA_CLIENT = None
 CHROMA_COLLECTION = None
+VECTORIZER = None
 
 def normalize_url(url: str) -> str:
     url = url.strip().lower()
@@ -39,7 +40,7 @@ def clean_json_string(filepath):
     return ''.join(out)
 
 def load_and_clean_data():
-    global CATALOG_DICT, CATALOG_LIST, CATALOG_BY_URL, CHROMA_CLIENT, CHROMA_COLLECTION
+    global CATALOG_DICT, CATALOG_LIST, CATALOG_BY_URL, CHROMA_CLIENT, CHROMA_COLLECTION, VECTORIZER
 
     filepath = "catalog.json"
     if not os.path.exists(filepath):
@@ -77,6 +78,7 @@ def load_and_clean_data():
     CATALOG_DICT = {}
     CATALOG_LIST = []
     CATALOG_BY_URL = {}
+    catalog_texts = []
 
     for item in cleaned_catalog:
         entity_id = item.get("entity_id")
@@ -86,13 +88,42 @@ def load_and_clean_data():
         CATALOG_DICT[str(entity_id)] = item
         CATALOG_LIST.append(item)
         
+        name = item.get("name", "")
+        description = item.get("description", "")
+        keys = item.get("keys", [])
+        keys_str = ", ".join(keys)
+        text_blob = f"{name}. {description}. Keys: {keys_str}"
+        catalog_texts.append(text_blob)
+        
         link = item.get("link")
         if link:
             CATALOG_BY_URL[normalize_url(link)] = item
 
+    if not catalog_texts:
+        print("Warning: no catalog items to index in Chroma DB.")
+        return
+
+    # 1. Fit the TF-IDF Vectorizer
+    VECTORIZER = TfidfVectorizer(ngram_range=(1, 2), stop_words="english")
+    VECTORIZER.fit(catalog_texts)
+
+    # 2. Define custom embedding function complying with Chroma interfaces
+    class TfidfEmbeddingFunction:
+        def __call__(self, input):
+            sparse = VECTORIZER.transform(input)
+            return sparse.toarray().tolist()
+            
+        def embed_documents(self, input):
+            return self(input)
+            
+        def embed_query(self, input):
+            if isinstance(input, str):
+                return self([input])[0]
+            return self(input)
+
     # Initialize Chroma client (in-memory EphemeralClient)
     CHROMA_CLIENT = chromadb.EphemeralClient()
-    emb_func = embedding_functions.DefaultEmbeddingFunction()
+    emb_func = TfidfEmbeddingFunction()
     
     # Recreate the collection to ensure no duplicate additions on startup re-runs
     try:
@@ -106,31 +137,26 @@ def load_and_clean_data():
     documents = []
     metadatas = []
 
-    for item in CATALOG_LIST:
+    for idx, item in enumerate(CATALOG_LIST):
         entity_id = str(item.get("entity_id", "")).strip()
         name = item.get("name", "")
-        description = item.get("description", "")
         keys = item.get("keys", [])
         keys_str = ", ".join(keys)
-        text_blob = f"{name}. {description}. Keys: {keys_str}"
 
         ids.append(entity_id)
-        documents.append(text_blob)
+        documents.append(catalog_texts[idx])
         metadatas.append({
             "name": name,
             "link": item.get("link", ""),
             "keys_str": keys_str
         })
 
-    if documents:
-        CHROMA_COLLECTION.add(
-            ids=ids,
-            documents=documents,
-            metadatas=metadatas
-        )
-        print(f"Chroma DB collection built: {len(CATALOG_LIST)} assessments indexed.")
-    else:
-        print("Warning: no catalog items to index in Chroma DB.")
+    CHROMA_COLLECTION.add(
+        ids=ids,
+        documents=documents,
+        metadatas=metadatas
+    )
+    print(f"Chroma DB collection built successfully with custom embedding: {len(CATALOG_LIST)} assessments indexed.")
 
 def search(query: str, top_k: int = 25):
     global CHROMA_COLLECTION, CATALOG_DICT
@@ -138,7 +164,7 @@ def search(query: str, top_k: int = 25):
     if CHROMA_COLLECTION is None:
         return []
 
-    # Query Chroma DB
+    # Query Chroma DB using the custom embedding function
     results = CHROMA_COLLECTION.query(
         query_texts=[query],
         n_results=top_k
