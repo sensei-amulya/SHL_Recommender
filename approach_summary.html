@@ -273,7 +273,7 @@
                         <li>Cleaned all keys/values of trailing spaces and handled nested string lists.</li>
                         <li>Each assessment's name, description, and keys concatenated into a text document blob.</li>
                         <li>Stored and indexed in-memory using an ephemeral **Chroma DB** collection.</li>
-                        <li>Vector embeddings generated via Chroma's default sentence-transformer.</li>
+                        <li>Vector embeddings generated via a **custom TF-IDF Embedding Function** to avoid high memory usage.</li>
                     </ul>
                 </div>
                 <div class="card">
@@ -316,7 +316,7 @@
             <div class="section-title">Evaluation Method & How Improvement Was Measured</div>
             <div class="section-content">
                 A local validation test suite (<code>benchmark.py</code>) was written with 10 automated test cases, 
-                each targeting a specific conversational rule or safety constraint. Improvement was monitored after 
+                each targeting a specific conversational rule or safety dimension. Improvement was monitored after 
                 architectural updates to ensure 100% test pass compliance.
             </div>
             <table>
@@ -397,8 +397,8 @@
             <div class="section-title">What Did Not Work</div>
             
             <div class="attempt-item">
-                <div class="attempt-title">Attempt 1 — Simple TF-IDF Vector Search</div>
-                Used TF-IDF unigrams/bigrams for keyword retrieval. While fast, it lacked semantic synonym understanding (e.g., failed to connect "coding" to "programming" assessments). Replaced with Chroma DB semantic vector search.
+                <div class="attempt-title">Attempt 1 — Default Chroma DB Transformer Embedding</div>
+                Chroma's default sentence-transformer embedding downloaded and loaded the <code>all-MiniLM-L6-v2</code> ONNX model, which consumed over 400MB of RAM and crashed Render's Free Tier container. Fixed by writing a custom <code>TfidfEmbeddingFunction</code> wrapper for Chroma DB, which reduced RAM usage to ~5MB.
             </div>
             
             <div class="attempt-item">
