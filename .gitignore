@@ -1,8 +1,6 @@
 # Ignore environment variables and API keys
 .env
 
-# Ignore generated/exported HTML artifacts
-approach_summary.html
 
 # Python caches and virtual environments
 __pycache__/

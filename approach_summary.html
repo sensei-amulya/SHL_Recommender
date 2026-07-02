@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SHL Assessment Recommender — Approach Summary</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+        /* Page Layout & Resets */
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            color: #1A202C;
+            margin: 0;
+            padding: 0;
+            background-color: #F7FAFC;
+            -webkit-print-color-adjust: exact;
+        }
+
+        /* Printable Page Wrapper */
+        .page {
+            width: 8.5in;
+            min-height: 11in;
+            padding: 0.8in;
+            background-color: #FFFFFF;
+            margin: 1.5rem auto;
+            box-shadow: 0 0 10px rgba(0,0,0,0.05);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        @media print {
+            body {
+                background-color: #FFFFFF;
+            }
+            .page {
+                width: 8.5in;
+                height: 11in;
+                margin: 0;
+                padding: 0.6in 0.8in 0.8in 0.8in;
+                box-shadow: none;
+                page-break-after: always;
+            }
+        }
+
+        /* Header Style */
+        .header {
+            border-bottom: 2px solid #1A202C;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            font-size: 24px;
+            font-weight: 800;
+            margin: 0;
+            letter-spacing: -0.5px;
+        }
+
+        /* Sections */
+        .section {
+            margin-bottom: 24px;
+        }
+        .section-title {
+            font-size: 14px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 0 0 12px 0;
+            border-left: 3.5px solid #1A202C;
+            padding-left: 10px;
+            line-height: 1.2;
+        }
+        .section-content {
+            font-size: 14px;
+            line-height: 1.5;
+            color: #2D3748;
+        }
+
+        /* Flow Diagram */
+        .flow-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #FFFFFF;
+            padding: 15px 10px;
+            margin: 10px 0;
+            border-radius: 8px;
+        }
+        .flow-box {
+            border: 1px solid #1A202C;
+            border-radius: 6px;
+            padding: 8px 12px;
+            text-align: center;
+            flex: 1;
+            margin: 0 6px;
+            min-height: 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .flow-box-title {
+            font-size: 12px;
+            font-weight: 700;
+        }
+        .flow-box-sub {
+            font-size: 10.5px;
+            color: #718096;
+            font-family: monospace;
+            margin-top: 4px;
+        }
+        .flow-arrow {
+            font-size: 16px;
+            font-weight: bold;
+            color: #718096;
+        }
+        .flow-caption {
+            text-align: center;
+            font-size: 12px;
+            color: #718096;
+            margin-top: 5px;
+        }
+
+        /* Two Column Grid */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 10px;
+        }
+        .card {
+            border: 1px solid #E2E8F0;
+            border-radius: 8px;
+            padding: 18px;
+            background-color: #FFFFFF;
+        }
+        .card-title {
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+            border-bottom: 1px solid #E2E8F0;
+            padding-bottom: 6px;
+        }
+        .card ul {
+            margin: 0;
+            padding-left: 18px;
+        }
+        .card li {
+            font-size: 12.5px;
+            line-height: 1.5;
+            margin-bottom: 8px;
+            color: #2D3748;
+        }
+
+        /* Prompt Design Bullet List */
+        .bullet-list {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .bullet-list li {
+            margin-bottom: 8px;
+            line-height: 1.5;
+            font-size: 13.5px;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 12px;
+        }
+        th, td {
+            padding: 8px 10px;
+            text-align: left;
+            border-bottom: 1px solid #E2E8F0;
+        }
+        th {
+            font-weight: 700;
+            color: #718096;
+            text-transform: uppercase;
+            font-size: 10.5px;
+            letter-spacing: 0.5px;
+        }
+        tr:hover {
+            background-color: #F8FAFC;
+        }
+
+        /* Attempts List */
+        .attempt-item {
+            margin-bottom: 16px;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+        .attempt-title {
+            font-weight: 700;
+            color: #1A202C;
+            margin-bottom: 4px;
+        }
+
+        /* Footers */
+        .footer {
+            margin-top: auto;
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: #A0AEC0;
+            border-top: 1px solid #E2E8F0;
+            padding-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ==================== PAGE 1 ==================== -->
+    <div class="page">
+        <div class="header">
+            <h1>SHL Assessment Recommender — Approach Summary</h1>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Problem Statement</div>
+            <div class="section-content">
+                Build a conversational API that helps hiring managers discover relevant SHL assessments from the 
+                entire product catalog. The system must ask clarifying questions, return grounded recommendations (10 max), 
+                refine results across turns dynamically, and compare assessments using catalog evidence — all within an 
+                8-turn budget and a 30-second response latency.
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">System Architecture</div>
+            <div class="flow-container">
+                <div class="flow-box">
+                    <div class="flow-box-title">Streamlit UI</div>
+                    <div class="flow-box-sub">app.py</div>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-box">
+                    <div class="flow-box-title">FastAPI Backend</div>
+                    <div class="flow-box-sub">main.py /chat</div>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-box">
+                    <div class="flow-box-title">Chroma DB Retrieval</div>
+                    <div class="flow-box-sub">search_engine.py</div>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-box">
+                    <div class="flow-box-title">LLM (Groq)</div>
+                    <div class="flow-box-sub">llm_agent.py</div>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-box">
+                    <div class="flow-box-title">Dynamic Validation</div>
+                    <div class="flow-box-sub">Search + History</div>
+                </div>
+            </div>
+            <div class="flow-caption">Stateless design — full message history sent on every request; previous recommendations parsed dynamically.</div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Retrieval Setup (RAG Layer)</div>
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-title">Index Construction</div>
+                    <ul>
+                        <li>Entire SHL catalog parsed from <code>catalog.json</code> (377 assessments) on service startup.</li>
+                        <li>Cleaned all keys/values of trailing spaces and handled nested string lists.</li>
+                        <li>Each assessment's name, description, and keys concatenated into a text document blob.</li>
+                        <li>Stored and indexed in-memory using an ephemeral **Chroma DB** collection.</li>
+                        <li>Vector embeddings generated via Chroma's default sentence-transformer.</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <div class="card-title">Query-Time Retrieval</div>
+                    <ul>
+                        <li>Latest user query is vectorized and queried against the Chroma collection.</li>
+                        <li>Top-25 results are retrieved to act as prompt catalog context for the LLM.</li>
+                        <li>**History Link Parsing**: Extracts previously recommended URLs from the assistant's previous replies.</li>
+                        <li>Reconstructed history items are injected alongside the Top-25 search results to guarantee refinement persistence.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="section" style="margin-bottom: 0;">
+            <div class="section-title">Prompt Design</div>
+            <ul class="bullet-list">
+                <li><strong>Role</strong>: Configured as a strict SHL domain advisor. Politely refuses general HR tips or prompt-injection attempts.</li>
+                <li><strong>Scope Policy</strong>: Hard stop for coding, legal compliance (HIPAA requirements), and general interviewing advice.</li>
+                <li><strong>Turn Injection</strong>: Injects <code>Current Turn: N / 8</code>. Turn 7/8 forces the LLM to complete and set <code>end_of_conversation: true</code>.</li>
+                <li><strong>Vague query rule</strong>: If context (role/seniority) is incomplete, demands clarification before listing shortlists.</li>
+                <li><strong>Anti-hallucination</strong>: LLM only returns entity_id strings. Backend validates the IDs against Chroma's top 25 results + history before resolving URLs/metadata.</li>
+                <li><strong>Temperature = 0</strong>: Enforced for reproducible, grounded outputs and strict JSON formatting.</li>
+            </ul>
+        </div>
+
+        <div class="footer">
+            <span>SHL Recommender – Approach Summary</span>
+            <span>Page 1 of 2</span>
+        </div>
+    </div>
+
+    <!-- ==================== PAGE 2 ==================== -->
+    <div class="page">
+        <div class="header">
+            <h1>SHL Assessment Recommender — Approach Summary</h1>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Evaluation Method & How Improvement Was Measured</div>
+            <div class="section-content">
+                A local validation test suite (<code>benchmark.py</code>) was written with 10 automated test cases, 
+                each targeting a specific conversational rule or safety constraint. Improvement was monitored after 
+                architectural updates to ensure 100% test pass compliance.
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 5%;">#</th>
+                        <th style="width: 30%;">Test Case</th>
+                        <th style="width: 25%;">Dimension Checked</th>
+                        <th style="width: 40%;">Pass Criterion</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>GET /health</td>
+                        <td>Availability</td>
+                        <td>HTTP 200, status: ok</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>Schema compliance</td>
+                        <td>Response structure</td>
+                        <td>All fields present; 10 or fewer items returned</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>No hallucinated URLs</td>
+                        <td>Groundedness</td>
+                        <td>Every recommended URL matches an item link in catalog</td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>Response latency</td>
+                        <td>Performance</td>
+                        <td>End-to-end response completes under 30 seconds</td>
+                    </tr>
+                    <tr>
+                        <td>5</td>
+                        <td>Vague query -> no recs</td>
+                        <td>Retrieval quality</td>
+                        <td>Returns 0 recommendations and asks for clarification</td>
+                    </tr>
+                    <tr>
+                        <td>6</td>
+                        <td>Off-topic refusal</td>
+                        <td>Scope safety</td>
+                        <td>Returns 0 recommendations; reply text signals refusal</td>
+                    </tr>
+                    <tr>
+                        <td>7</td>
+                        <td>Recommends with context</td>
+                        <td>Relevance</td>
+                        <td>At least 1 valid assessment returned in JSON shortlist</td>
+                    </tr>
+                    <tr>
+                        <td>8</td>
+                        <td>Refinement mid-conversation</td>
+                        <td>Constraint handling</td>
+                        <td>Shortlist modified according to user instruction</td>
+                    </tr>
+                    <tr>
+                        <td>9</td>
+                        <td>Turn cap enforcement</td>
+                        <td>Conversation control</td>
+                        <td><code>end_of_conversation</code> flag is true by turn 8</td>
+                    </tr>
+                    <tr>
+                        <td>10</td>
+                        <td>Cap at 10 recommendations</td>
+                        <td>Output limits</td>
+                        <td>Never returns more than 10 recommendations</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <div class="section-title">What Did Not Work</div>
+            
+            <div class="attempt-item">
+                <div class="attempt-title">Attempt 1 — Simple TF-IDF Vector Search</div>
+                Used TF-IDF unigrams/bigrams for keyword retrieval. While fast, it lacked semantic synonym understanding (e.g., failed to connect "coding" to "programming" assessments). Replaced with Chroma DB semantic vector search.
+            </div>
+            
+            <div class="attempt-item">
+                <div class="attempt-title">Attempt 2 — Dirty catalog on-disk parses</div>
+                Catalog strings contained raw newline characters and trailing spaces in JSON keys, breaking standard library parsers. Implemented a disk-level JSON cleaner to standardize <code>catalog.json</code> into strict valid JSON format.
+            </div>
+
+            <div class="attempt-item">
+                <div class="attempt-title">Attempt 3 — Stateless shortlist drops during refinement</div>
+                Since the API is stateless, mid-conversation refinements (e.g., "add personality tests") triggered new vector searches that excluded previous context matches, causing the LLM to drop items it previously recommended. Fixed by parsing previous assistant messages, reconstructing previous matches from URLs, and feeding them back to the RAG layer.
+            </div>
+            
+            <div class="attempt-item">
+                <div class="attempt-title">Attempt 4 — LLM outputting full URLs directly</div>
+                The model frequently hallucinated URL paths and invented product names. Replaced with ID-only output (entity_id) in JSON format, leaving metadata lookup and link rendering to deterministic Python functions.
+            </div>
+        </div>
+
+        <div class="section" style="margin-bottom: 0;">
+            <div class="section-title">Key Design Choices</div>
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-title">Chroma DB & Groq LLM</div>
+                    <ul>
+                        <li>**Lightweight Vector Storage**: In-memory ephemeral database client avoids external cloud hosting dependency.</li>
+                        <li>**Fast Sub-2s Inference**: `llama-3.1-8b-instant` keeps API responses well within the 30s timeout window.</li>
+                        <li>**Strict JSON Mode**: Standardizes response formats to ensure evaluator compliance.</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <div class="card-title">Stateless Design & Verification</div>
+                    <ul>
+                        <li>**Scale Ready**: No database sessions required; horizontally scalable out-of-the-box.</li>
+                        <li>**Deduplicated Shortlists**: Test type mappings and language parameters are resolved via Python helper functions.</li>
+                        <li>**Reconstructive Context**: Keeps context footprints small by reading previous message blocks.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <span>SHL Recommender – Approach Summary</span>
+            <span>Page 2 of 2</span>
+        </div>
+    </div>
+
+</body>
+</html>
