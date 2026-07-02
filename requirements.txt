@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+pydantic
+groq
+scikit-learn
+python-dotenv
+requests
+streamlit
+chromadb
