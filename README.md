@@ -1,3 +1,13 @@
+---
+title: SHL Recommender API
+emoji: 🤖
+colorFrom: blue
+colorTo: indigo
+sdk: docker
+app_port: 7860
+pinned: false
+---
+
 # SHL Conversational Assessment Recommender
 
 A conversational recommendation service that helps hiring managers select the right SHL assessments from the product catalog. Built using **FastAPI**, **Chroma DB** (vector database), the **Groq LLM API** (`llama-3.1-8b-instant`), and a **Streamlit** user interface.
